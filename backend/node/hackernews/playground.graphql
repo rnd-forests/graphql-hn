@@ -1,0 +1,43 @@
+query {
+  feed {
+    id,
+    description,
+    url
+  }
+}
+
+mutation {
+  storeLink(
+    url: "https://google.com",
+  	description: "Sample description"
+  ) {
+    id,
+    url,
+    description
+  }
+}
+
+query {
+  link(id: "link-0") {
+    url,
+    description
+  }
+}
+
+mutation {
+  updateLink(
+    id: "link-0",
+  	url: "https://google.com.vn",
+    description: "Updated description"
+  ) {
+    url,
+    description
+  }
+}
+
+mutation {
+  deleteLink(id: "link-4") {
+    url,
+    description
+  }
+}

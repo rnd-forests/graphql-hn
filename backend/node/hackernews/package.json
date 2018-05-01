@@ -1,0 +1,11 @@
+{
+  "name": "hackernews",
+  "version": "1.0.0",
+  "description": "Hackernews cloned application using GraphQL.",
+  "main": "index.js",
+  "author": "Vinh Nguyen",
+  "license": "MIT",
+  "dependencies": {
+    "graphql-yoga": "^1.13.1"
+  }
+}
