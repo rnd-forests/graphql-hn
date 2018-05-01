@@ -1,71 +1,65 @@
-const { GraphQLServer } = require('graphql-yoga')
-
-let links = [{
-    id: 'link-0',
-    url: 'www.howtographql.com',
-    description: 'Fullstack tutorial for GraphQL'
-}]
-
-let idCount = links.length
+const { GraphQLServer } = require("graphql-yoga")
+const { Prisma } = require("prisma-binding")
 
 const resolvers = {
     Query: {
-        info: () => 'This is the API of a Hackernews Clone',
-        feed: () => links,
-        link: (root, args) => {
-            let result = links.find(link => link.id === args.id)
-            if (result === undefined) {
-                return new Error('Cannot find the link with the given ID.')
-            }
-            return result
+        feed: (root, args, context, info) => {
+            return context.db.query.links({}, info)
+        },
+
+        link: (root, args, context, info) => {
+            return context.db.query.link({
+                where: {
+                    id: args.id
+                }
+            }, info)
         }
     },
 
     Mutation: {
-        storeLink: (root, args) => {
-            const link = {
-                id: `link-${idCount++}`,
-                description: args.description,
-                url: args.url,
-            }
-            links.push(link)
-            return link
+        storeLink: (root, args, context, info) => {
+            return context.db.mutation.createLink({
+                data: {
+                    url: args.url,
+                    description: args.description
+                }
+            }, info)
         },
 
-        updateLink: (root, args) => {
-            let idx = links.findIndex(link => link.id === args.id)
-            if (idx === -1) {
-                return new Error('Cannot find the link with the given ID.')
-            }
-            let link = links[idx]
-            link.url = args.url
-            link.description = args.description
-            links[idx] = link
-            return link
+        updateLink: (root, args, context, info) => {
+            return context.db.mutation.updateLink({
+                data: {
+                    url: args.url,
+                    description: args.description
+                },
+
+                where: {
+                    id: args.id
+                }
+            }, info)
         },
 
-        deleteLink: (root, args) => {
-            let idx = links.findIndex(link => link.id === args.id)
-            if (idx === -1) {
-                return new Error('Cannot find the link with the given ID.')
-            }
-
-            return links.splice(idx, 1)[0]
+        deleteLink: (root, args, context, info) => {
+            return context.db.mutation.deleteLink({
+                where: {
+                    id: args.id
+                }
+            }, info)
         }
     },
-
-    // GraphQL server can automatically infers the resolver for
-    // the Link type, so we don't need to specifiy it here.
-    // Link: {
-    //     id: (root, args, context, info) => root.id,
-    //     description: (root) => root.description,
-    //     url: (root) => root.url,
-    // }
 }
 
-// Create new server instance and start it
 const server = new GraphQLServer({
     typeDefs: './src/schema.graphql',
     resolvers,
+    context: req => ({
+        ...req,
+        db: new Prisma({
+            typeDefs: 'src/generated/prisma.graphql',
+            endpoint: 'http://localhost:4466/hackernews/dev',
+            secret: 'mysecret123',
+            debug: true,
+        }),
+    }),
 })
 server.start(() => console.log('Server is running on http://localhost:4000'))
