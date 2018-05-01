@@ -4,12 +4,12 @@ import { getUserId } from '../utils'
 import { APP_SECRET } from '../constants'
 
 async function signup(parent, args, context, info) {
-    const password = await hash(args.password, 10)
-    const user = await context.db.mutation.createUser({
+    let password = await hash(args.password, 10)
+    let user = await context.db.mutation.createUser({
         data: { ...args, password },
     }, `{ id }`)
 
-    const token = sign({ userId: user.id }, APP_SECRET)
+    let token = sign({ userId: user.id }, APP_SECRET)
 
     return {
         token,
@@ -18,7 +18,7 @@ async function signup(parent, args, context, info) {
 }
 
 async function login(parent, args, context, info) {
-    const user = await context.db.query.user({
+    let user = await context.db.query.user({
         where: {
             email: args.email
         }
@@ -27,14 +27,12 @@ async function login(parent, args, context, info) {
         throw new Error('User not found')
     }
 
-    const valid = await compare(args.password, user.password)
+    let valid = await compare(args.password, user.password)
     if (!valid) {
         throw new Error('Invalid password')
     }
 
-    console.log(APP_SECRET)
-
-    const token = sign({ userId: user.id }, APP_SECRET)
+    let token = sign({ userId: user.id }, APP_SECRET)
 
     return {
         token,
@@ -42,8 +40,8 @@ async function login(parent, args, context, info) {
     }
 }
 
-function storeLink(root, args, context, info) {
-    const userId = getUserId(context)
+function storeLink(parent, args, context, info) {
+    let userId = getUserId(context)
     return context.db.mutation.createLink({
         data: {
             url: args.url,
@@ -53,7 +51,7 @@ function storeLink(root, args, context, info) {
     }, info)
 }
 
-function updateLink(root, args, context, info) {
+function updateLink(parent, args, context, info) {
     return context.db.mutation.updateLink({
         data: {
             url: args.url,
@@ -66,10 +64,29 @@ function updateLink(root, args, context, info) {
     }, info)
 }
 
-function deleteLink(root, args, context, info) {
+function deleteLink(parent, args, context, info) {
     return context.db.mutation.deleteLink({
         where: {
             id: args.id
+        }
+    }, info)
+}
+
+async function vote(parent, args, context, info) {
+    let userId = getUserId(context)
+    let alreadyVoted = await context.db.exists.Vote({
+        user: { id: userId },
+        link: { id: args.linkId }
+    })
+
+    if (alreadyVoted) {
+        throw new Error(`Already voted for link ${args.linkId}`)
+    }
+
+    return context.db.mutation.createVote({
+        data: {
+            user: { connect: { id: userId } },
+            link: { connect: { id: args.linkId } }
         }
     }, info)
 }
@@ -80,4 +97,5 @@ export default {
     storeLink,
     updateLink,
     deleteLink,
+    vote,
 }

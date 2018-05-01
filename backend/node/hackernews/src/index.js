@@ -6,11 +6,13 @@ import { Prisma } from 'prisma-binding'
 import Query from './resolvers/Query'
 import Mutation from './resolvers/Mutation'
 import AuthPayload from './resolvers/AuthPayload'
+import Subscription from './resolvers/Subscription'
 
 const resolvers = {
     Query,
     Mutation,
-    AuthPayload
+    AuthPayload,
+    Subscription,
 }
 
 const server = new GraphQLServer({

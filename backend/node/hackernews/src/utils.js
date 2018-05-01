@@ -1,7 +1,7 @@
 import { verify } from 'jsonwebtoken'
 import { APP_SECRET } from './constants'
 
-function getUserId(context) {
+export function getUserId(context) {
     const auth = context.request.get('Authorization')
     if (auth) {
         const token = auth.replace('Bearer ', '')
@@ -10,8 +10,4 @@ function getUserId(context) {
     }
 
     throw new Error('Not authenticated')
-}
-
-export default {
-    getUserId,
 }
