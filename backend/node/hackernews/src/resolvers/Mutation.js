@@ -1,14 +1,15 @@
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { APP_SECRET, getUserId } = require('../utils')
+import { hash, compare } from 'bcryptjs'
+import { sign } from 'jsonwebtoken'
+import { getUserId } from '../utils'
+import { APP_SECRET } from '../constants'
 
 async function signup(parent, args, context, info) {
-    const password = await bcrypt.hash(args.password, 10)
+    const password = await hash(args.password, 10)
     const user = await context.db.mutation.createUser({
         data: { ...args, password },
     }, `{ id }`)
 
-    const token = jwt.sign({ userId: user.id }, APP_SECRET)
+    const token = sign({ userId: user.id }, APP_SECRET)
 
     return {
         token,
@@ -26,12 +27,14 @@ async function login(parent, args, context, info) {
         throw new Error('User not found')
     }
 
-    const valid = await bcrypt.compare(args.password, user.password)
+    const valid = await compare(args.password, user.password)
     if (!valid) {
         throw new Error('Invalid password')
     }
 
-    const token = jwt.sign({ userId: user.id }, APP_SECRET)
+    console.log(APP_SECRET)
+
+    const token = sign({ userId: user.id }, APP_SECRET)
 
     return {
         token,
@@ -71,7 +74,7 @@ function deleteLink(root, args, context, info) {
     }, info)
 }
 
-module.exports = {
+export default {
     signup,
     login,
     storeLink,

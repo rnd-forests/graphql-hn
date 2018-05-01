@@ -6,6 +6,6 @@ function user(parent, args, context, info) {
     }, info)
 }
 
-module.exports = {
+export default {
     user,
 }

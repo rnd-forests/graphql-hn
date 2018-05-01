@@ -1,9 +1,11 @@
-const { GraphQLServer } = require("graphql-yoga")
-const { Prisma } = require("prisma-binding")
+import 'babel-polyfill'
 
-const Query = require('./resolvers/Query')
-const Mutation = require('./resolvers/Mutation')
-const AuthPayload = require('./resolvers/AuthPayload')
+import { GraphQLServer } from 'graphql-yoga'
+import { Prisma } from 'prisma-binding'
+
+import Query from './resolvers/Query'
+import Mutation from './resolvers/Mutation'
+import AuthPayload from './resolvers/AuthPayload'
 
 const resolvers = {
     Query,
