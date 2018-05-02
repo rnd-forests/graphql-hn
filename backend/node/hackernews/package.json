@@ -9,7 +9,8 @@
     "webpack-dev": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=./webpack.config.js",
     "deploy": "prisma deploy -e .env",
     "serve": "node -r dotenv/config dist/index.js",
-    "dev": "npm run deploy && npm run webpack-dev && npm run serve"
+    "playground": "graphql playground",
+    "dev": "npm run webpack-dev && npm run deploy && npm-run-all --parallel serve playground"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -25,6 +26,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
     "cross-env": "^5.1.4",
+    "npm-run-all": "^4.1.2",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.1.2"
   }
