@@ -15,20 +15,19 @@ const resolvers = {
     Feed,
 }
 
+const db = new Prisma({
+    typeDefs: 'src/schema/generated/database.graphql',
+    endpoint: process.env.PRISMA_ENDPOINT,
+    secret: process.env.PRISMA_SECRET,
+    debug: true,
+})
+
 const server = new GraphQLServer({
     typeDefs: './src/schema/main.graphql',
     resolvers,
     resolverValidationOptions: {
         requireResolversForResolveType: false
     },
-    context: req => ({
-        ...req,
-        db: new Prisma({
-            typeDefs: 'src/schema/prisma.graphql',
-            endpoint: process.env.PRISMA_ENDPOINT,
-            secret: process.env.PRISMA_SECRET,
-            debug: true,
-        }),
-    }),
+    context: req => ({ ...req, db }),
 })
 server.start(() => console.log('GraphQL server is running...'))

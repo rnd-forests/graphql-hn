@@ -7,9 +7,9 @@
   "license": "MIT",
   "scripts": {
     "webpack-dev": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=./webpack.config.js",
-    "deploy": "prisma deploy -e .env",
+    "deploy": "yarn prisma deploy -e .env",
     "serve": "node -r dotenv/config dist/index.js",
-    "playground": "graphql playground",
+    "playground": "yarn graphql playground",
     "dev": "npm run webpack-dev && npm run deploy && npm-run-all --parallel serve playground"
   },
   "dependencies": {
@@ -26,7 +26,9 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
     "cross-env": "^5.1.4",
+    "graphql": "^0.13.2",
     "npm-run-all": "^4.1.2",
+    "prisma": "^1.7.4",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.1.2"
   }
