@@ -1,9 +1,7 @@
 # import Link, LinkSubscriptionPayload, Vote, VoteSubscriptionPayload, LinkOrderByInput from "./generated/prisma.graphql"
 
 type Query {
-    info: String!
-    feed(filter: String, skip: Int, first: Int, orderBy: LinkOrderByInput): [Link!]!
-    link(id: ID!): Link
+    feed(filter: String, skip: Int, first: Int, orderBy: LinkOrderByInput): Feed!
 }
 
 type Mutation {
@@ -32,4 +30,9 @@ type User {
     name: String!
     email: String!
     links: [Link!]!
+}
+
+type Feed {
+    links: [Link!]!
+    count: Int!
 }

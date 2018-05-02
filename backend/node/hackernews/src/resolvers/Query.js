@@ -1,4 +1,4 @@
-function feed(parent, args, context, info) {
+async function feed(parent, args, context, info) {
     let where = {}
     let filter = args.filter
     if (filter) {
@@ -10,12 +10,30 @@ function feed(parent, args, context, info) {
         }
     }
 
-    return context.db.query.links({
+    // Get the list of all link IDs according to
+    // the given filtering conditions.
+    let queriedLinks = await context.db.query.links({
         where,
         skip: args.skip,
         first: args.first,
         orderBy: args.orderBy,
-    }, info)
+    }, `{ id }`)
+
+    let countSelectionSet = `
+        {
+            aggregate {
+                count
+            }
+        }
+    `
+
+    // Query the total number of links currently stored in the database
+    let linksConnection = await context.db.query.linksConnection({}, countSelectionSet)
+
+    return {
+        count: linksConnection.aggregate.count,
+        linkIds: queriedLinks.map(link => link.id),
+    }
 }
 
 export default {

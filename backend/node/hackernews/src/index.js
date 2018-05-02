@@ -7,12 +7,14 @@ import Query from './resolvers/Query'
 import Mutation from './resolvers/Mutation'
 import AuthPayload from './resolvers/AuthPayload'
 import Subscription from './resolvers/Subscription'
+import Feed from './resolvers/Feed'
 
 const resolvers = {
     Query,
     Mutation,
     AuthPayload,
     Subscription,
+    Feed,
 }
 
 const server = new GraphQLServer({
