@@ -20,11 +20,14 @@ const resolvers = {
 const server = new GraphQLServer({
     typeDefs: './src/schema.graphql',
     resolvers,
+    resolverValidationOptions: {
+        requireResolversForResolveType: false
+    },
     context: req => ({
         ...req,
         db: new Prisma({
             typeDefs: 'src/generated/prisma.graphql',
-            endpoint: 'http://localhost:4466/hackernews/dev',
+            endpoint: 'http://localhost:4466',
             secret: 'mysecret123',
             debug: true,
         }),

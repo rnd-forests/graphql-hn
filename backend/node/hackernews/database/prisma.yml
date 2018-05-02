@@ -1,9 +1,3 @@
-service: hackernews
-
-stage: dev
-
+endpoint: http://localhost:4466
 datamodel: datamodel.graphql
-
 secret: mysecret123
-
-cluster: local
