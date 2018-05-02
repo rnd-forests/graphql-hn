@@ -1,5 +1,3 @@
-import 'babel-polyfill'
-
 import { GraphQLServer } from 'graphql-yoga'
 import { Prisma } from 'prisma-binding'
 
@@ -18,7 +16,7 @@ const resolvers = {
 }
 
 const server = new GraphQLServer({
-    typeDefs: './src/schema.graphql',
+    typeDefs: './src/schema/main.graphql',
     resolvers,
     resolverValidationOptions: {
         requireResolversForResolveType: false
@@ -26,9 +24,9 @@ const server = new GraphQLServer({
     context: req => ({
         ...req,
         db: new Prisma({
-            typeDefs: 'src/generated/prisma.graphql',
-            endpoint: 'http://localhost:4466',
-            secret: 'mysecret123',
+            typeDefs: 'src/schema/prisma.graphql',
+            endpoint: process.env.PRISMA_ENDPOINT,
+            secret: process.env.PRISMA_SECRET,
             debug: true,
         }),
     }),
