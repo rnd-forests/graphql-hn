@@ -1,4 +1,4 @@
-let tailwindcss = require("tailwindcss");
+let tailwindcss = require('tailwindcss');
 
 module.exports = {
   plugins: [
