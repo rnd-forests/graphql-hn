@@ -25,7 +25,7 @@ async function feed(parent, args, context, info) {
         count
       }
     }
-    `
+  `
 
   // Query the total number of links currently stored in the database
   let linksConnection = await context.db.query.linksConnection({}, countSelectionSet)
