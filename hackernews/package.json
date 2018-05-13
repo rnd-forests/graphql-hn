@@ -14,8 +14,8 @@
     "react-scripts": "1.1.4"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,json,css}": [
-      "prettier --single-quote --write",
+    "src/**/*.{js,jsx,json,scss,md,graphql}": [
+      "prettier --write",
       "git add"
     ]
   },
