@@ -1,5 +1,5 @@
-import {GraphQLServer} from 'graphql-yoga'
-import {Prisma} from 'prisma-binding'
+import { GraphQLServer } from 'graphql-yoga'
+import { Prisma } from 'prisma-binding'
 
 import Query from './resolvers/Query'
 import Mutation from './resolvers/Mutation'
@@ -12,14 +12,14 @@ const resolvers = {
   Mutation,
   AuthPayload,
   Subscription,
-  Feed,
+  Feed
 }
 
 const db = new Prisma({
   typeDefs: 'src/schema/generated/database.graphql',
   endpoint: process.env.PRISMA_ENDPOINT,
   secret: process.env.PRISMA_SECRET,
-  debug: true,
+  debug: true
 })
 
 const server = new GraphQLServer({
@@ -28,6 +28,6 @@ const server = new GraphQLServer({
   resolverValidationOptions: {
     requireResolversForResolveType: false
   },
-  context: req => ({...req, db}),
+  context: req => ({ ...req, db })
 })
 server.start(() => console.log('GraphQL server is running...'))

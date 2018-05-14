@@ -1,22 +1,21 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import './assets/dist/app.css'
-import App from './components/App'
-import registerServiceWorker from './registerServiceWorker'
-
-import ApolloClient from 'apollo-boost'
+import { render } from 'react-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { ApolloProvider } from 'react-apollo'
 
-const client = new ApolloClient({
-  uri: 'http://localhost:4000'
-})
+import App from './App'
+import AppComponent from './components/App'
+import registerServiceWorker from './registerServiceWorker'
 
-const apollo = (AppComponent) => (
-  <ApolloProvider client={client}>
-    <AppComponent />
-  </ApolloProvider>
+import './assets/dist/app.css'
+
+render(
+  <BrowserRouter>
+    <ApolloProvider client={App.getApolloClient()}>
+      <AppComponent />
+    </ApolloProvider>
+  </BrowserRouter>,
+  document.getElementById('root')
 )
-
-ReactDOM.render(apollo(App), document.getElementById('root'))
 
 registerServiceWorker()

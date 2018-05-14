@@ -12,15 +12,15 @@ services:
         # managementApiSecret: my-secret
         databases:
           default:
-            connector: postgres
+            connector: mysql
             active: true
             host: db
-            port: 5432
+            port: 3306
             user: prisma
             password: prisma
   db:
-    image: postgres
+    image: mysql:5.7
     restart: always
     environment:
-      POSTGRES_USER: prisma
-      POSTGRES_PASSWORD: prisma
+      MYSQL_USER: prisma
+      MYSQL_ROOT_PASSWORD: prisma

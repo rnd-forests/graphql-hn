@@ -3,15 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "apollo-boost": "^0.1.6",
+    "apollo-cache-inmemory": "^1.2.1",
     "apollo-client": "^2.3.1",
-    "flow-bin": "^0.72.0",
+    "apollo-link": "^1.2.2",
+    "apollo-link-error": "^1.0.9",
+    "apollo-link-http": "^1.5.4",
+    "apollo-link-state": "^0.4.1",
     "graphql": "^0.13.2",
+    "graphql-tag": "^2.9.2",
     "react": "^16.3.2",
     "react-apollo": "^2.1.4",
     "react-client": "^1.0.1",
     "react-dom": "^16.3.2",
-    "react-scripts": "1.1.4"
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.1.4",
+    "toastr": "^2.1.4"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,json,scss,md,graphql}": [
@@ -22,18 +29,24 @@
   "scripts": {
     "flow": "flow",
     "precommit": "lint-staged",
+    "compile-ts": "tsc",
+    "tslint": "tslint --format --project tsconfig.json --config tslint.json 'src/**/*.ts'",
     "build-css": "postcss src/assets/sass/app.scss -o src/assets/dist/app.css",
     "start": "react-scripts start",
-    "build": "npm run build-css && react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "build": "yarn build-css && yarn compile-ts && react-scripts build",
+    "test": "react-scripts test --env=jsdom && jest",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
     "autoprefixer": "^8.4.1",
+    "flow-bin": "^0.72.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.1.0",
     "postcss-cli": "^5.0.0",
     "prettier": "^1.12.1",
-    "tailwindcss": "^0.5.3"
+    "tailwindcss": "^0.5.3",
+    "tslint": "^5.10.0",
+    "tslint-config-airbnb": "^5.8.0",
+    "typescript": "^2.8.3"
   }
 }

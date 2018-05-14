@@ -1,25 +1,12 @@
 import React, { Component } from 'react'
-import { graphql } from 'react-apollo'
-import { gql } from 'apollo-boost'
+import { Query } from 'react-apollo'
+import gql from 'graphql-tag'
+import toastr from 'toastr'
+
 import Link from './Link'
+import Loading from './Loading'
 
-class LinkList extends Component {
-  render() {
-    if (this.props.feedQuery && this.props.feedQuery.loading) {
-      return <div>Loading</div>
-    }
-
-    if (this.props.feedQuery && this.props.feedQuery.error) {
-      return <div>Error</div>
-    }
-
-    let links = this.props.feedQuery.feed.links
-
-    return <div>{links.map((link) => <Link key={link.id} link={link} />)}</div>
-  }
-}
-
-const FEED_QUERY = gql`
+export const FEED_QUERY = gql`
   query FeedQuery {
     feed {
       links {
@@ -27,9 +14,56 @@ const FEED_QUERY = gql`
         url
         description
         createdAt
+        postedBy {
+          id
+          name
+        }
+        votes {
+          id
+          user {
+            id
+          }
+        }
       }
     }
   }
 `
 
-export default graphql(FEED_QUERY, { name: 'feedQuery' })(LinkList)
+class LinkList extends Component {
+  render() {
+    return (
+      <Query query={FEED_QUERY}>
+        {({ loading, error, data }) => {
+          if (loading) return <Loading />
+          if (error) {
+            toastr.error(`${error.message}`, 'Cannot fetch the feed!')
+          }
+
+          return (
+            !error && (
+              <div>
+                {data.feed.links.map((link, index) => (
+                  <Link
+                    key={link.id}
+                    index={index}
+                    link={link}
+                    updateStoreAfterVote={this._updateCacheAfterVote}
+                  />
+                ))}
+              </div>
+            )
+          )
+        }}
+      </Query>
+    )
+  }
+
+  _updateCacheAfterVote = (store, createVote, linkId) => {
+    let data = store.readQuery({ query: FEED_QUERY })
+    let votedLink = data.feed.links.find((link) => link.id === linkId)
+    votedLink.votes = createVote.link.votes
+    store.writeQuery({ query: FEED_QUERY, data })
+  }
+}
+
+export default LinkList
