@@ -7,5 +7,5 @@ function user(parent, args, context, info) {
 }
 
 export default {
-  user,
+  user
 }

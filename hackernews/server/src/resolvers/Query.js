@@ -4,9 +4,9 @@ async function feed(parent, args, context, info) {
   if (filter) {
     where = {
       OR: [
-        {url_contains: args.filter},
-        {description_contains: args.filter},
-      ],
+        { url_contains: args.filter },
+        { description_contains: args.filter }
+      ]
     }
   }
 
@@ -16,7 +16,7 @@ async function feed(parent, args, context, info) {
     where,
     skip: args.skip,
     first: args.first,
-    orderBy: args.orderBy,
+    orderBy: args.orderBy
   }, `{ id }`)
 
   let countSelectionSet = `
@@ -32,10 +32,10 @@ async function feed(parent, args, context, info) {
 
   return {
     count: linksConnection.aggregate.count,
-    linkIds: queriedLinks.map(link => link.id),
+    linkIds: queriedLinks.map(link => link.id)
   }
 }
 
 export default {
-  feed,
+  feed
 }

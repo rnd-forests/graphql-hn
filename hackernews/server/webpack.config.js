@@ -6,10 +6,10 @@ dotenv.config()
 
 let nodeModules = {}
 fs.readdirSync('node_modules')
-  .filter(function (module) {
+  .filter(function(module) {
     return ['.bin'].indexOf(module) === -1
   })
-  .forEach(function (module) {
+  .forEach(function(module) {
     nodeModules[module] = 'commonjs ' + module
   })
 
@@ -43,7 +43,7 @@ module.exports = {
                   {
                     modules: false,
                     targets: {
-                      browsers: ["> 2%"],
+                      browsers: ['> 2%'],
                       uglify: true
                     }
                   }

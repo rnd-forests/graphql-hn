@@ -24,5 +24,5 @@ const newVote = {
 
 export default {
   newLink,
-  newVote,
+  newVote
 }

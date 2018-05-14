@@ -1,19 +1,19 @@
-import {hash, compare} from 'bcryptjs'
-import {sign} from 'jsonwebtoken'
-import {getUserId} from '../utils'
-import {APP_SECRET} from '../constants'
+import { compare, hash } from 'bcryptjs'
+import { sign } from 'jsonwebtoken'
+import { getUserId } from '../utils'
+import { APP_SECRET } from '../constants'
 
 async function signup(parent, args, context, info) {
   let password = await hash(args.password, 10)
   let user = await context.db.mutation.createUser({
-    data: {...args, password},
+    data: { ...args, password }
   }, `{ id }`)
 
-  let token = sign({userId: user.id}, APP_SECRET)
+  let token = sign({ userId: user.id }, APP_SECRET)
 
   return {
     token,
-    user,
+    user
   }
 }
 
@@ -32,11 +32,11 @@ async function login(parent, args, context, info) {
     throw new Error('Invalid password')
   }
 
-  let token = sign({userId: user.id}, APP_SECRET)
+  let token = sign({ userId: user.id }, APP_SECRET)
 
   return {
     token,
-    user,
+    user
   }
 }
 
@@ -46,7 +46,7 @@ function storeLink(parent, args, context, info) {
     data: {
       url: args.url,
       description: args.description,
-      postedBy: {connect: {id: userId}},
+      postedBy: { connect: { id: userId } }
     }
   }, info)
 }
@@ -75,8 +75,8 @@ function deleteLink(parent, args, context, info) {
 async function vote(parent, args, context, info) {
   let userId = getUserId(context)
   let alreadyVoted = await context.db.exists.Vote({
-    user: {id: userId},
-    link: {id: args.linkId}
+    user: { id: userId },
+    link: { id: args.linkId }
   })
 
   if (alreadyVoted) {
@@ -85,8 +85,8 @@ async function vote(parent, args, context, info) {
 
   return context.db.mutation.createVote({
     data: {
-      user: {connect: {id: userId}},
-      link: {connect: {id: args.linkId}}
+      user: { connect: { id: userId } },
+      link: { connect: { id: args.linkId } }
     }
   }, info)
 }
@@ -97,5 +97,5 @@ export default {
   storeLink,
   updateLink,
   deleteLink,
-  vote,
+  vote
 }
