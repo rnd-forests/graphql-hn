@@ -1,15 +1,19 @@
 import Client from './apollo/Client'
 
-class App {
+export default class App {
   /**
-   * Create new Apollo client with predefined options.
+   * Create new Apollo client with custom options.
    *
    * @returns {Client<any>}
    */
-  static getApolloClient() {
+  static createClient() {
     let networkInterface = {
       uri: this.getGraphQLServerUrl(),
       fetchOptions: {
+        // We're using cookies for authentication and authorization.
+        // This options tells the network interface to send the cookie
+        // along with every request. The value here is 'include' because
+        // the server and the client is in different domains.
         credentials: 'include'
       },
       devTools: this.inDevelopmentMode()
@@ -33,8 +37,6 @@ class App {
    * @returns {string}
    */
   static getGraphQLServerUrl() {
-    return process.env.REACT_APP_GRAPHQL_SERVER_URL
+    return process.env.REACT_APP_GRAPHQL_SERVER_URL || '/graphql'
   }
 }
-
-export default App

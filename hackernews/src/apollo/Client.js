@@ -35,6 +35,7 @@ var apollo_link_1 = require('apollo-link')
 var apollo_link_http_1 = require('apollo-link-http')
 var apollo_link_state_1 = require('apollo-link-state')
 var apollo_link_error_1 = require('apollo-link-error')
+var apollo_link_retry_1 = require('apollo-link-retry')
 var apollo_cache_inmemory_1 = require('apollo-cache-inmemory')
 var apollo_client_1 = require('apollo-client')
 var getCache = function(config) {
@@ -45,6 +46,41 @@ var getCache = function(config) {
   }
   return new apollo_cache_inmemory_1.InMemoryCache()
 }
+var requestSendingLink = new apollo_link_1.ApolloLink(function(
+  operation,
+  forward
+) {
+  operation.setContext(function(_a) {
+    var _b = _a.headers,
+      headers = _b === void 0 ? {} : _b
+    return {
+      headers: __assign({}, headers, {
+        'x-token': localStorage.getItem('token') || null,
+        'x-refresh-token': localStorage.getItem('refresh-token') || null
+      })
+    }
+  })
+  return forward(operation)
+})
+var requestSentLink = new apollo_link_1.ApolloLink(function(
+  operation,
+  forward
+) {
+  return forward(operation).map(function(data) {
+    var headers = operation.getContext().response.headers
+    if (headers) {
+      var token = headers.get('x-token')
+      var refreshToken = headers.get('x-refresh-token')
+      if (token) {
+        localStorage.setItem('token', token)
+      }
+      if (refreshToken) {
+        localStorage.setItem('refresh-token', refreshToken)
+      }
+    }
+    return data
+  })
+})
 var getStateLink = function(config, cache) {
   if (config && config.clientState) {
     return apollo_link_state_1.withClientState(
@@ -53,6 +89,14 @@ var getStateLink = function(config, cache) {
   }
   return false
 }
+var retryLink = new apollo_link_retry_1.RetryLink({
+  delay: {
+    initial: 200
+  },
+  attempts: {
+    max: 3
+  }
+})
 var getErrorLink = function(config) {
   if (config && config.onError) {
     return apollo_link_error_1.onError(config.onError)
@@ -108,10 +152,9 @@ var getRequestHandler = function(config) {
   return false
 }
 var getHttpLink = function(config) {
-  return new apollo_link_http_1.HttpLink({
+  return apollo_link_http_1.createHttpLink({
     uri: (config && config.uri) || '/graphql',
-    fetchOptions: (config && config.fetchOptions) || {},
-    credentials: 'same-origin'
+    fetchOptions: (config && config.fetchOptions) || {}
   })
 }
 var Client = (function(_super) {
@@ -123,13 +166,22 @@ var Client = (function(_super) {
     var errorLink = getErrorLink(config)
     var requestHandler = getRequestHandler(config)
     var httpLink = getHttpLink(config)
-    var defaultOptions = config.defaultOptions
-    var connectToDevTools = config.devTools
+    var httpLinkWithMiddleware = requestSentLink.concat(
+      requestSendingLink.concat(httpLink)
+    )
     var link = apollo_link_1.ApolloLink.from(
-      [errorLink, requestHandler, stateLink, httpLink].filter(function(x) {
+      [
+        errorLink,
+        retryLink,
+        stateLink,
+        requestHandler,
+        httpLinkWithMiddleware
+      ].filter(function(x) {
         return !!x
       })
     )
+    var defaultOptions = config.defaultOptions
+    var connectToDevTools = config.devTools
     _this =
       _super.call(this, {
         cache: cache,

@@ -19,4 +19,4 @@ secret: ${env:PRISMA_SECRET}
 # in `.graphqlconfig` and then invokes a code generation process.
 hooks:
   post-deploy:
-    - yarn graphql get-schema --project database
+    - graphql get-schema --project database

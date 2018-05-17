@@ -2,6 +2,10 @@
 
 ### Configuration
 
+```
+yarn global add graphql-cli
+```
+
 Change directory to `database` where `docker-compose.yml` file is stored, and run command:
 ```
 docker-compose up -d

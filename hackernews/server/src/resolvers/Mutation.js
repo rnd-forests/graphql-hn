@@ -1,47 +1,58 @@
-import { compare, hash } from 'bcryptjs'
-import { sign } from 'jsonwebtoken'
-import { getUserId } from '../utils'
-import { APP_SECRET } from '../constants'
+import bcrypt from 'bcryptjs'
 
-async function signup(parent, args, context, info) {
-  let password = await hash(args.password, 10)
+import Auth from '../auth'
+import { authRequired, getAuthUserId } from '../permissions'
+import ms from 'ms'
+
+async function signup(parent, args, context) {
+  let password = await bcrypt.hash(args.password, 10)
+
   let user = await context.db.mutation.createUser({
     data: { ...args, password }
-  }, `{ id }`)
-
-  let token = sign({ userId: user.id }, APP_SECRET)
+  })
 
   return {
-    token,
     user
   }
 }
 
-async function login(parent, args, context, info) {
-  let user = await context.db.query.user({
+async function login(parent, args, { response, db }) {
+  let user = await db.query.user({
     where: {
       email: args.email
     }
   }, `{ id password }`)
+
   if (!user) {
     throw new Error('User not found')
   }
 
-  let valid = await compare(args.password, user.password)
+  let valid = await bcrypt.compare(args.password, user.password)
   if (!valid) {
     throw new Error('Invalid password')
   }
 
-  let token = sign({ userId: user.id }, APP_SECRET)
+  let [token, refreshToken] = await Auth.createTokens(user, process.env.APP_SECRET);
+
+  response.cookie('token', token, {
+    maxAge: ms('1d'),
+    httpOnly: true
+  })
+
+  response.cookie('refresh-token', refreshToken, {
+    maxAge: ms('7d'),
+    httpOnly: true
+  })
 
   return {
+    user,
     token,
-    user
+    refreshToken
   }
 }
 
-function storeLink(parent, args, context, info) {
-  let userId = getUserId(context)
+let storeLink = authRequired.createResolver((parent, args, context, info) => {
+  let userId = getAuthUserId(context)
   return context.db.mutation.createLink({
     data: {
       url: args.url,
@@ -49,7 +60,7 @@ function storeLink(parent, args, context, info) {
       postedBy: { connect: { id: userId } }
     }
   }, info)
-}
+})
 
 function updateLink(parent, args, context, info) {
   return context.db.mutation.updateLink({
@@ -73,7 +84,7 @@ function deleteLink(parent, args, context, info) {
 }
 
 async function vote(parent, args, context, info) {
-  let userId = getUserId(context)
+  let userId = getAuthUserId(context)
   let alreadyVoted = await context.db.exists.Vote({
     user: { id: userId },
     link: { id: args.linkId }

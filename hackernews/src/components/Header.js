@@ -2,11 +2,9 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { withRouter } from 'react-router'
 
-import { AUTH_TOKEN } from '../constants'
-
 class Header extends Component {
   render() {
-    const authToken = localStorage.getItem(AUTH_TOKEN)
+    const authToken = true //temp
 
     return (
       <div className="flex justify-between flex-no-wrap bg-orange p-4">
@@ -29,7 +27,7 @@ class Header extends Component {
             <div
               className="cursor-pointer text-black mr-2"
               onClick={() => {
-                localStorage.removeItem(AUTH_TOKEN)
+                // localStorage.removeItem(AUTH_TOKEN)
                 this.props.history.push(`/`)
               }}
             >

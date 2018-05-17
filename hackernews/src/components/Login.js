@@ -2,7 +2,24 @@ import React, { Component } from 'react'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 
-import { AUTH_TOKEN } from '../constants'
+let SIGNUP_MUTATION = gql`
+  mutation SignupMutation($name: String!, $email: String!, $password: String!) {
+    signup(name: $name, email: $email, password: $password) {
+      user {
+        id
+      }
+    }
+  }
+`
+
+let LOGIN_MUTATION = gql`
+  mutation LoginMutation($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      token
+      refreshToken
+    }
+  }
+`
 
 class Login extends Component {
   state = {
@@ -27,7 +44,7 @@ class Login extends Component {
               </label>
 
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                className="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
                 id="name"
                 type="text"
                 value={this.state.name}
@@ -43,7 +60,7 @@ class Login extends Component {
               e-mail address
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+              className="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
               id="email"
               type="email"
               placeholder="foo@example.com"
@@ -59,7 +76,7 @@ class Login extends Component {
               password
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+              className="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
               id="password"
               type="password"
               value={this.state.password}
@@ -70,7 +87,7 @@ class Login extends Component {
             <div className="md:w-1/3" />
             <div className="md:w-2/3">
               <button
-                className="shadow bg-purple hover:bg-purple-light text-white py-2 px-4 rounded mb-2 mr-2"
+                className="bg-purple hover:bg-purple-light text-white py-2 px-4 rounded mb-2 mr-2"
                 type="button"
                 onClick={() => this._confirm()}
               >
@@ -93,7 +110,8 @@ class Login extends Component {
   }
 
   _confirm = async () => {
-    const { name, email, password } = this.state
+    let { name, email, password } = this.state
+
     if (this.state.login) {
       let result = await this.props.loginMutation({
         variables: {
@@ -101,42 +119,26 @@ class Login extends Component {
           password
         }
       })
-      let { token } = result.data.login
-      this._saveUserData(token)
+      let { token, refreshToken } = result.data.login
+      this._saveUserData(token, refreshToken)
     } else {
-      let result = await this.props.signupMutation({
+      await this.props.signupMutation({
         variables: {
           name,
           email,
           password
         }
       })
-      let { token } = result.data.signup
-      this._saveUserData(token)
     }
+
     this.props.history.push('/')
   }
 
-  _saveUserData = (token) => {
-    localStorage.setItem(AUTH_TOKEN, token)
+  _saveUserData = (token, refreshToken) => {
+    localStorage.setItem('token', token)
+    localStorage.setItem('refresh-token', refreshToken)
   }
 }
-
-const SIGNUP_MUTATION = gql`
-  mutation SignupMutation($name: String!, $email: String!, $password: String!) {
-    signup(name: $name, email: $email, password: $password) {
-      token
-    }
-  }
-`
-
-const LOGIN_MUTATION = gql`
-  mutation LoginMutation($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      token
-    }
-  }
-`
 
 export default compose(
   graphql(SIGNUP_MUTATION, { name: 'signupMutation' }),

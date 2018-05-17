@@ -2,12 +2,11 @@ import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-import { AUTH_TOKEN } from '../constants'
 import { timeDifferenceForDate } from '../helpers'
 
 class Link extends Component {
   render() {
-    const authToken = localStorage.getItem(AUTH_TOKEN)
+    const authToken = true // temp
 
     return (
       <div className="flex items-start mb-2">
