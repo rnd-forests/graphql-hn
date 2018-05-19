@@ -27,7 +27,6 @@ class Header extends Component {
             <div
               className="cursor-pointer text-black mr-2"
               onClick={() => {
-                // localStorage.removeItem(AUTH_TOKEN)
                 this.props.history.push(`/`)
               }}
             >

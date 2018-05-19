@@ -2,8 +2,12 @@ import React, { Component } from 'react'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 
-let SIGNUP_MUTATION = gql`
-  mutation SignupMutation($name: String!, $email: String!, $password: String!) {
+let REGISTER_MUTATION = gql`
+  mutation RegisterMutation(
+    $name: String!
+    $email: String!
+    $password: String!
+  ) {
     signup(name: $name, email: $email, password: $password) {
       user {
         id
@@ -113,16 +117,15 @@ class Login extends Component {
     let { name, email, password } = this.state
 
     if (this.state.login) {
-      let result = await this.props.loginMutation({
+      let response = await this.props.loginMutation({
         variables: {
           email,
           password
         }
       })
-      let { token, refreshToken } = result.data.login
-      this._saveUserData(token, refreshToken)
+      this._saveUserData(response)
     } else {
-      await this.props.signupMutation({
+      await this.props.registerMutation({
         variables: {
           name,
           email,
@@ -134,13 +137,14 @@ class Login extends Component {
     this.props.history.push('/')
   }
 
-  _saveUserData = (token, refreshToken) => {
-    localStorage.setItem('token', token)
-    localStorage.setItem('refresh-token', refreshToken)
+  _saveUserData = (response) => {
+    let { token, refreshToken } = response.data.login
+
+    this.props.storeUserData(token, refreshToken)
   }
 }
 
 export default compose(
-  graphql(SIGNUP_MUTATION, { name: 'signupMutation' }),
+  graphql(REGISTER_MUTATION, { name: 'registerMutation' }),
   graphql(LOGIN_MUTATION, { name: 'loginMutation' })
 )(Login)

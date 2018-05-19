@@ -1,10 +1,11 @@
 import bcrypt from 'bcryptjs'
 
 import Auth from '../auth'
+import Server from '../server'
 import { authRequired, getAuthUserId } from '../permissions'
 import ms from 'ms'
 
-async function signup(parent, args, context) {
+async function register(parent, args, context) {
   let password = await bcrypt.hash(args.password, 10)
 
   let user = await context.db.mutation.createUser({
@@ -36,12 +37,14 @@ async function login(parent, args, { response, db }) {
 
   response.cookie('token', token, {
     maxAge: ms('1d'),
-    httpOnly: true
+    httpOnly: true,
+    secure: Server.inProduction()
   })
 
   response.cookie('refresh-token', refreshToken, {
     maxAge: ms('7d'),
-    httpOnly: true
+    httpOnly: true,
+    secure: Server.inProduction()
   })
 
   return {
@@ -103,7 +106,7 @@ async function vote(parent, args, context, info) {
 }
 
 export default {
-  signup,
+  register,
   login,
   storeLink,
   updateLink,
