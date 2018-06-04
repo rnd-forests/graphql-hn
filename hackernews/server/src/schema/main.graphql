@@ -5,7 +5,7 @@ type Query {
 }
 
 type Mutation {
-  signup(email: String!, password: String!, name: String!): SignupPayload
+  register(email: String!, password: String!, name: String!): RegisterPayload
   login(email: String!, password: String!): LoginPayload
 
   storeLink(url: String!, description: String!): Link!
@@ -20,7 +20,7 @@ type Subscription {
   newVote: VoteSubscriptionPayload
 }
 
-type SignupPayload {
+type RegisterPayload {
   user: User
 }
 

@@ -1,17 +1,8 @@
-let fs = require('fs')
-let dotenv = require('dotenv')
 let path = require('path')
+let dotenv = require('dotenv')
+let nodeExternals = require('webpack-node-externals')
 
 dotenv.config()
-
-let nodeModules = {}
-fs.readdirSync('node_modules')
-  .filter(function(module) {
-    return ['.bin'].indexOf(module) === -1
-  })
-  .forEach(function(module) {
-    nodeModules[module] = 'commonjs ' + module
-  })
 
 module.exports = {
   entry: './src/index.js',
@@ -25,7 +16,9 @@ module.exports = {
     filename: 'index.js'
   },
 
-  externals: nodeModules,
+  externals: [
+    nodeExternals()
+  ],
 
   module: {
     rules: [
@@ -43,7 +36,6 @@ module.exports = {
                   {
                     modules: false,
                     targets: {
-                      browsers: ['> 2%'],
                       uglify: true
                     }
                   }

@@ -92,12 +92,14 @@ export default class Server {
 
           res.cookie('token', tokens.token, {
             maxAge: ms('1d'),
-            httpOnly: true
+            httpOnly: true,
+            secure: !this.devMode
           })
 
           res.cookie('refresh-token', tokens.refreshToken, {
             maxAge: ms('7d'),
-            httpOnly: true
+            httpOnly: true,
+            secure: !this.devMode
           })
         }
         req.user = tokens.user
@@ -149,5 +151,14 @@ export default class Server {
    */
   static getClientEndpoints() {
     return process.env.CLIENT_ENDPOINT
+  }
+
+  /**
+   * Check if the server is in production environment or not.
+   *
+   * @returns {boolean}
+   */
+  static inProduction() {
+    return process.env.NODE_ENV === 'production'
   }
 }
